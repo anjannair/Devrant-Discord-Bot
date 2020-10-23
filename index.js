@@ -1,5 +1,7 @@
 const fs = require("fs");
+const config = require('./config.json');
 const Discord = require('discord.js');
+require('dotenv').config();
 const bot = new Discord.Client({ ws: { intents: Discord.Intents.ALL } }); 
 bot.aliases = new Discord.Collection();
 bot.commands = new Discord.Collection();
