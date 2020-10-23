@@ -1,0 +1,17 @@
+{
+  "name": "devrant-discord-bot",
+  "version": "1.0.0",
+  "description": "A devrant bot for the server of devrant on discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bot"
+  ],
+  "author": "Anyone who wants to contribute",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "discord.js": "^12.4.0"
+  }
+}
