@@ -1,5 +1,5 @@
 const { Command } = require('discord.js-commando');
-
+//basic command to test
 module.exports = class welcome extends Command {
 	constructor(client) {
 		super(client, {
@@ -7,10 +7,11 @@ module.exports = class welcome extends Command {
 			group: 'tools',
 			memberName: 'welcome',
 			description: 'Welcomes the user for no reason',
+			guildOnly:true
 		});
 	}
 
-	run(message) {
+	async run(message) {
 		return message.say(`Welcome to the ${message.guild.name} server
 
 		Total number of members are: ${message.guild.memberCount}

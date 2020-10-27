@@ -4,6 +4,7 @@
   "description": "A devrant bot for the server of devrant on discord",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -14,6 +15,8 @@
   "dependencies": {
     "discord.js": "^12.4.1",
     "discord.js-commando": "github:discordjs/Commando",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.6",
+    "rantscript": "^1.4.0"
   }
 }
