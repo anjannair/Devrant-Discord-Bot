@@ -50,7 +50,7 @@ module.exports = class verify extends Command {
         message.author.send(embed);    //sends the captcha
 
         try{
-        const msg = await message.reply("Sent you the code\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`) on the main post\n\nLink: https://devrant.com/collabs/3221539/devrant-community-server-in-discord\n\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
+        const msg = await message.reply("Sent you the verification token\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`) on the main post\n\nLink: https://devrant.com/collabs/3221539/devrant-community-server-in-discord\n\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
 
         try{
             const filter = m => {
@@ -90,7 +90,10 @@ module.exports = class verify extends Command {
                     let verified = message.member.guild.roles.cache.find(role => role.id === process.env.VERIFIED);
                     let unverified = message.member.guild.roles.cache.find(role => role.id === process.env.UNVERIFIED);
                     if(verified){ 
-                        message.member.roles.add(verified);
+                        message.member.roles.add(verified).catch(err =>
+                            {
+                                return message.reply("I do not have permissions to add the role to you😭")
+                            });
                         message.member.roles.remove(unverified);
                         const verifembed = new Discord.MessageEmbed()
                             .setColor('#00FF00')
