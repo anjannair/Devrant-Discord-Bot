@@ -16,7 +16,7 @@
     "discord.js": "^12.4.1",
     "discord.js-commando": "github:discordjs/Commando",
     "dotenv": "^8.2.0",
-    "nodemon": "^2.0.6",
-    "rantscript": "^1.4.0"
+    "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.6"
   }
 }

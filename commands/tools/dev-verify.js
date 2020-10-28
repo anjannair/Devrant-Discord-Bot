@@ -1,8 +1,7 @@
 const { Command } = require('discord.js-commando');
-var devRant = require('rantscript');
+const fetch = require('node-fetch');
 
-//basic command to test
-module.exports = class welcome extends Command {
+module.exports = class verify extends Command {
 	constructor(client) {
 		super(client, {
 			name: 'verify',
@@ -18,35 +17,63 @@ module.exports = class welcome extends Command {
 
 	async run(message) {
         const captcha = Math.random().toString(36).slice(2, 8);
-        //console.log(message.member.displayName);
         let rantcommentid;  //to verify if comment in main post
         let rantbody;
-        let error;
-        await devRant
-            .profile(message.member.displayName)
-            .then((response)=>{
-                rantcommentid = response.content.content.comments[0].rant_id;
-                rantbody = response.content.content.comments[0].body;
-            })
-            .catch((err)=>{
-                error = err;
-            })
-        if(error) return message.reply("Your username or nickname doesn't match with the one on devRant\nOR\nYou have no comments")
+        let userid;
+
+        //getting the userID by name
+        let idfetcher = `https://devrant.com/api/get-user-id?app=3&username=${message.member.displayName}`;
+        let response = await fetch(idfetcher);
+        let data = await response.json();
+        //checking for invalid username
+        if(!data.user_id) return message.reply("Your username or nickname on Discord does not match the one on devRant!")
+        userid = data.user_id;
+
         message.author.send(`-connect+discord+${captcha}-`);    //sends the captcha
-        message.reply("Sent you the code\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`) on the main post\n\nLink: https://devrant.com/collabs/3221539/devrant-community-server-in-discord\n\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\`**");
-        message.channel.awaitMessages(m => m.author.id == message.author.id, //waits for 30 minutes and the tries
-            {max: 1, time: 1800000}).then(collected => {
-                if (collected.first().content.toLowerCase() == 'done') {
-                    console.log("hmm");
-                    console.log(rantcommentid+" "+rantbody)
-                    if(rantcommentid != "2924805") return message.author.send("Your recent comment is not in the link provided\nAborting....");//3221539
-                    if(rantbody != `-connect+discord+${captcha}-`) return message.author.send("Couldn't find the token");
-                    let verified = member.guild.roles.cache.find(role => role.name === `test`);//change this
-				    if(verified) member.roles.add(verified);
-			    	if(!verified) console.log("No unverified tag");
+
+        try{
+        const msg = await message.reply("Sent you the code\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`) on the main post\n\nLink: https://devrant.com/collabs/3221539/devrant-community-server-in-discord\n\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
+
+        try{
+            const filter = m => {
+                if(m.author.bot) return;
+                if(m.author.id === m.member.id && m.content.toLowerCase() === "done") return true;
+                else {
+                    m.channel.send('Please type Done (case-insensitive)');
+                    return false;
                 }
-            }).catch(() => {
-            message.reply('No answer after 30 minutes, operation cancelled.');
-            });
-	}
+            };
+
+            const response = await msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time']});
+                if(response){
+                    //getting the latest comment by ID
+                    let commentfetcher = `https://devrant.com/api/users/${userid}?app=3`
+                    let response2 = await fetch(commentfetcher);
+                    let data2 = await response2.json();
+                    rantbody = data2.profile.content.content.comments[0].body;
+                    rantcommentid = data2.profile.content.content.comments[0].rant_id;
+
+                    //checks for rant and token in rant
+                    if(rantcommentid != process.env.MAINRANT) return message.author.send("Your recent comment is not in the link provided\nAborting....");//3221539
+                    if(rantbody != `-connect+discord+${captcha}-`) return message.author.send("Couldn't find the token");
+
+                    //finding the role
+                    let verified = message.member.guild.roles.cache.find(role => role.id === process.env.VERIFIED);
+                    let unverified = message.member.guild.roles.cache.find(role => role.id === process.env.UNVERIFIED);
+                    if(verified){ 
+                        message.member.roles.add(verified);
+                        message.member.roles.remove(unverified);
+                        message.author.send("You have been verified!");
+                    }
+                    if(!verified) console.log("No verified tag");
+                }
+            }
+            catch(err){
+                console.log(err);
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
 };
