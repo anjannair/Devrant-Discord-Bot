@@ -11,6 +11,7 @@ module.exports = class verify extends Command {
 			memberName: 'rant',
             description: 'Fetches a random rant aka surprise rant from devrant',
             guildOnly: true,
+            clientPermissions: ['EMBED_LINKS'],
             throttling: {
                 usages: 2,
                 duration: 20,

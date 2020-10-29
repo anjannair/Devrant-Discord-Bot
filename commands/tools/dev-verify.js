@@ -16,7 +16,7 @@ module.exports = class verify extends Command {
                 usages: 1,
                 duration: 30,
             },
-            clientPermissions: ['MANAGE_ROLES']
+            clientPermissions: ['MANAGE_ROLES','EMBED_LINKS']
 		});
 	}
 
