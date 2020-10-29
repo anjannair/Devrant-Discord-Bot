@@ -13,8 +13,8 @@ const client = new CommandoClient({
 
 client.registry
 	.registerDefaultTypes()
-	.registerGroups([
-		['tools', 'All the tools for the server'], //Classifies each command and sorts it
+	.registerGroups([ //Classifies each command and sorts it
+		['tools', 'All the tools for the server'],	//for all the tools
 	])
 	.registerDefaultGroups()
 	.registerDefaultCommands({
@@ -32,4 +32,4 @@ client.once('ready', () => {
 
 client.on('error', console.error);
 
-client.login(process.env.TOKEN);
+client.login(process.env.TOKEN2);

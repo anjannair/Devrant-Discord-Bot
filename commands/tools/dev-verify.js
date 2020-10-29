@@ -1,6 +1,7 @@
 const { Command } = require('discord.js-commando');
 const fetch = require('node-fetch');
 const Discord = require("discord.js");
+const apiurl = require("./rantapi.js")
 
 
 module.exports = class verify extends Command {
@@ -36,7 +37,7 @@ module.exports = class verify extends Command {
 
         //getting the userID by name
         let userid;
-        let idfetcher = `https://devrant.com/api/get-user-id?app=3&username=${message.member.displayName}`;
+        let idfetcher = `${apiurl.url}/get-user-id?app=3&username=${message.member.displayName}`;
         let response = await fetch(idfetcher);
         let data = await response.json();
         
@@ -57,7 +58,7 @@ module.exports = class verify extends Command {
                 if(m.author.bot) return;
                 if(m.author.id === message.member.id && m.content.toLowerCase() === "done") return true;
                 if(m.content.toLowerCase() != "done" && m.author.id === message.member.id){
-                    m.say('Please type \`DONE\` (case-insensitive)');
+                    m.say('Please type \`DONE\`');
                     return false;
                 }
                 else{
@@ -68,7 +69,7 @@ module.exports = class verify extends Command {
             const response = await msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time']});
                 if(response){
                     //getting the latest comment by ID
-                    let commentfetcher = `https://devrant.com/api/users/${userid}?app=3`
+                    let commentfetcher = `${apiurl.url}/users/${userid}?app=3`
                     let response2 = await fetch(commentfetcher);
                     let data2 = await response2.json();
                     rantbody = data2.profile.content.content.comments[0].body;
@@ -83,7 +84,7 @@ module.exports = class verify extends Command {
                         .setColor("#FF0000")
                         .setDescription("Couldn't find the token\nEnsure your recent comment was the token")
 
-                    if(rantcommentid != process.env.MAINRANT) return message.author.send(notfoundrantcommentid);//3221539
+                    if(rantcommentid != process.env.MAINRANT) return message.author.send(notfoundrantcommentid);
                     if(rantbody != `-connect+discord+${captcha}-`) return message.author.send(notfoundrantbody);
 
                     //finding the role
