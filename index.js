@@ -54,7 +54,6 @@ client.on('message', async message =>{
 			.setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}`)
 		message.channel.send(embed);
 	}
-	else return;
 })
 
 client.on('error', console.error);
