@@ -46,14 +46,46 @@ client.on('message', async message =>{
 		let data = await response.json();
 		if(!data) return;
 		if(data.sm_api_error) return;
-		if(data.sm_api_character_count > 2048) return;
-		
-		const embed = new Discord.MessageEmbed()
+		let summary = data.sm_api_content;
+
+		//To handle the limitations of text by discord 
+		if(data.sm_api_character_count > 2048){
+			summary = data.sm_api_content.substring(0,2044)+"...";
+			const embed = new Discord.MessageEmbed()
 			.setTitle(data.sm_api_title)
 			.setColor('#FF7F50')
-			.setDescription(data.sm_api_content)
+			.setDescription(summary)
+			.setFooter(`Click on the forward button to go to the next page.\nPage [1/2]`)
+			
+			const filter = (reaction, user) => {
+				return ['⏩'].includes(reaction.emoji.name) && user.id === message.author.id;
+			};
+			
+			message.channel.send(embed).then(sentembed=>{
+				sentembed.react('⏩');
+				sentembed.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] })
+					.then(collected => {
+						const reaction = collected.first();
+						if (reaction.emoji.name === '⏩') {
+							const editembed = new Discord.MessageEmbed()
+							.setTitle(data.sm_api_title)
+							.setColor('#FF7F50')
+							.setDescription(data.sm_api_content.substring(2043,data.sm_api_content.length))
+							.setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nPage[2/2]`)
+							sentembed.edit(editembed);
+						}
+						})
+			});
+		}
+		//for normal summaries
+		else{
+			const embed = new Discord.MessageEmbed()
+			.setTitle(data.sm_api_title)
+			.setColor('#FF7F50')
+			.setDescription(summary)
 			.setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}`)
 		message.channel.send(embed);
+		}
 		message.channel.stopTyping();
 	}
 })
