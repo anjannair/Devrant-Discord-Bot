@@ -38,7 +38,6 @@ client.on('message', async message =>{
 		return (res !== null);
 	}
 	if(isValidURL(message.content.toLowerCase())==true){
-		message.channel.startTyping();
 		let storyfetcher = `https://api.smmry.com/&SM_API_KEY=${process.env.TLDR}&SM_URL=${message.content.toLowerCase()}`
         let response = await fetch(storyfetcher).catch(err =>{
 			console.log("error");
@@ -86,7 +85,6 @@ client.on('message', async message =>{
 			.setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}`)
 		message.channel.send(embed);
 		}
-		message.channel.stopTyping();
 	}
 })
 
