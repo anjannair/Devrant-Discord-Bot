@@ -41,6 +41,7 @@ client.on('message', async message =>{
 		let storyfetcher = `https://api.smmry.com/&SM_API_KEY=${process.env.TLDR}&SM_URL=${message.content.toLowerCase()}`
         let response = await fetch(storyfetcher).catch(err =>{
 			console.log("error");
+			return;
 		});
 		let data = await response.json();
 		if(!data) return;
