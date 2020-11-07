@@ -32,11 +32,16 @@ client.once('ready', () => {
 });
 
 client.on('message', async message =>{
+	//channels excluded
+	if(message.channel.id == '764539644335358003' || message.channel.id == '764556340425130005' || message.channel.id == '767151113421979678') return;
+	
 	function isValidURL(string) {
 		//regex for link
 		const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
 		return (res !== null);
 	}
+	
+	//summarizing
 	if(isValidURL(message.content.toLowerCase())==true){
 			let storyfetcher = `https://api.smmry.com/&SM_API_KEY=${process.env.TLDR}&SM_URL=${message.content.toLowerCase()}`
         	let response = await fetch(storyfetcher).catch(err =>{
