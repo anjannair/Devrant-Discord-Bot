@@ -101,4 +101,4 @@ client.on('message', async message =>{
 
 client.on('error', console.error);
 
-client.login(process.env.TOKEN2);
+client.login(process.env.TOKEN);
