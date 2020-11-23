@@ -97,7 +97,7 @@ module.exports = class verify extends Command {
                         message.member.roles.remove(unverified);
                         const verifembed = new Discord.MessageEmbed()
                             .setColor('#00FF00')
-                            .setDescription("You have been verified\n\n")
+                            .setDescription("You have been verified\n\nPro tip: Use `*rant` on the server to check out devRant rants!")
                             .setFooter("Signing off", "https://emoji.gg/assets/emoji/9192_random_tick.png");
                         message.author.send(verifembed);
                     }
