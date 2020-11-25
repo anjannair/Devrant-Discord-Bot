@@ -32,9 +32,9 @@ module.exports = class verify extends Command {
             let lastmessage;
             let lastmessageid;
             let lastmessagechannel;
-            if (who.lastMessage) {
-                lastmessage = who.lastMessage.content;
-                lastmessageid = who.lastMessageID;
+            if (await who.lastMessage) {
+                lastmessage = await who.lastMessage.content;
+                lastmessageid = await who.lastMessageID;
                 await this.client.channels.fetch(who.lastMessageChannelID)
                     .then(channel => {lastmessagechannel = "#"+channel.name});
             }
