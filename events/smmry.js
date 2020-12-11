@@ -29,6 +29,7 @@ module.exports = async message => {
         };
         message.awaitReactions(newfilter, { max: 1, time: 300000, errors: ['time'] })
             .then(async collected => {
+                var reacted_user = collected.first().users.cache.map(user => user.username+"#"+user.discriminator);
                 const waitreaction = collected.first();
                 if (waitreaction.emoji.name === '❓') {
 
@@ -39,7 +40,7 @@ module.exports = async message => {
                             .setTitle(data.sm_api_title)
                             .setColor('#FF7F50')
                             .setDescription(summary)
-                            .setFooter(`Click on the forward button to go to the next page.\nPage [1/2]`)
+                            .setFooter(`Click on the forward button to go to the next page.\nPage [1/2]\nRequested by ${reacted_user[1]}`)
 
                         const filter = (reaction, user) => {
                             return ['⏩'].includes(reaction.emoji.name) && user.id === message.author.id;
@@ -55,7 +56,7 @@ module.exports = async message => {
                                             .setTitle(data.sm_api_title)
                                             .setColor('#FF7F50')
                                             .setDescription(data.sm_api_content.substring(2043, data.sm_api_content.length))
-                                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nPage[2/2]`)
+                                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nPage[2/2]\nRequested by ${reacted_user[1]}`)
                                         sentembed.edit(editembed);
                                     }
                                 })
@@ -67,7 +68,7 @@ module.exports = async message => {
                             .setTitle(data.sm_api_title)
                             .setColor('#FF7F50')
                             .setDescription(summary)
-                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}`)
+                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nRequested by ${reacted_user[1]}`)
                         message.channel.send(embed);
                     }
                 }
