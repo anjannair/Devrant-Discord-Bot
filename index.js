@@ -16,6 +16,7 @@ client.registry
 	.registerDefaultTypes()
 	.registerGroups([ //Classifies each command and sorts it
 		['tools', 'All the tools for the server'],	//for all the tools
+		['usersettings', 'All the setings for the user'], //for the user
 	])
 	.registerDefaultGroups()
 	.registerDefaultCommands({

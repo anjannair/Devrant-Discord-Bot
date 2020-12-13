@@ -11,7 +11,7 @@ module.exports = class setafk extends Command {
     constructor(client) {
         super(client, {
             name: 'setafk',
-            group: 'tools',
+            group: 'usersettings',
             memberName: 'setafk',
             description: 'Set yourself as AFK!',
             guildOnly: true,
