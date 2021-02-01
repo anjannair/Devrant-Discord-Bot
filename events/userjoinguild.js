@@ -1,9 +1,11 @@
 const Discord = require("discord.js");
 const { Command } = require('discord.js-commando');
+const index = require('../index');
+const bot = index.client;
 /* No welcome for bots */
 
 module.exports = async (member) => {
-    const fire = this.client.emojis.cache.get("764807476696055839");
+    const fire = bot.emojis.cache.get("764807476696055839");
     if (member.user.bot) return;
     var channel = member.guild.channels.cache.find(ch => ch.id === process.env.WELCOME);
     if (!channel) return;

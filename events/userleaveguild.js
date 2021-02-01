@@ -1,6 +1,8 @@
 const { Command } = require('discord.js-commando');
+const index = require('../index');
+const bot = index.client;
 module.exports = async member => {
-    const lag = this.client.emojis.cache.get("764808105653043202");
+    const lag = bot.emojis.cache.get("764808105653043202");
     if (member.user.bot) return;
 
     var channel = member.guild.channels.cache.find(ch => ch.id === process.env.WELCOME);
