@@ -4,10 +4,9 @@ const Discord = require("discord.js");
 
 module.exports = async (member) => {
     if (member.user.bot) return;
-    const fire = this.client.emojis.cache.get("764807476696055839");
     var channel = member.guild.channels.cache.find(ch => ch.id === process.env.WELCOME);
     if (!channel) return;
-    channel.send(`Hello, ${member}! We are glad to see you at dRCS ${fire}`);
+    channel.send(`Hello, ${member}! We are glad to see you at dRCS :fireblob:`);
 
     var embs = new Discord.MessageEmbed()
         .setColor('#FF7F50')
