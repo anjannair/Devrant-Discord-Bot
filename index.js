@@ -12,6 +12,10 @@ const client = new CommandoClient({
 	ws: { intents: Discord.Intents.ALL }
 });
 
+module.exports = {
+	client: client,
+};
+
 client.registry
 	.registerDefaultTypes()
 	.registerGroups([ //Classifies each command and sorts it
