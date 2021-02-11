@@ -11,26 +11,26 @@ module.exports = async message => {
         const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
         return (res !== null);
     }
-
-    //summarizing
     if (isValidURL(message.content.toLowerCase()) == true) {
-        let storyfetcher = `https://api.smmry.com/&SM_API_KEY=${process.env.TLDR}&SM_URL=${message.content.toLowerCase()}`
+        let storyfetcher = `https://api.smmry.com/&SM_API_KEY=${process.env.TLDR}&SM_URL=${message.content.toLowerCase()}`;
         let response = await fetch(storyfetcher).catch(err => {
             console.log("error");
             return;
         });
-        let data = await response.json();
+        let data = await response.json().catch(err => {
+            return;
+        });
         if (!data) return;
         if (data.sm_api_error) return;
         let summary = data.sm_api_content;
-        message.react('❓');
+        await message.react('❓');
         const newfilter = (reaction, user) => {
             return ['❓'].includes(reaction.emoji.name) && user.bot == false;
         };
-        message.awaitReactions(newfilter, { max: 1, time: 300000, errors: ['time'] })
+        await message.awaitReactions(newfilter, { max: 1, time: 300000, errors: ['time'] })
             .then(async collected => {
-                var reacted_user = collected.first().users.cache.map(user => user.username+"#"+user.discriminator);
                 const waitreaction = collected.first();
+                var reacted_user = collected.first().users.cache.map(user => user.username + "#" + user.discriminator);
                 if (waitreaction.emoji.name === '❓') {
 
                     //To handle the limitations of text by discord 
@@ -40,7 +40,7 @@ module.exports = async message => {
                             .setTitle(data.sm_api_title)
                             .setColor('#FF7F50')
                             .setDescription(summary)
-                            .setFooter(`Click on the forward button to go to the next page.\nPage [1/2]\nRequested by ${reacted_user[1]}`)
+                            .setFooter(`Click on the forward button to go to the next page.\nPage [1/2]\nRequested by ${reacted_user[1]}`);
 
                         const filter = (reaction, user) => {
                             return ['⏩'].includes(reaction.emoji.name) && user.id === message.author.id;
@@ -56,10 +56,10 @@ module.exports = async message => {
                                             .setTitle(data.sm_api_title)
                                             .setColor('#FF7F50')
                                             .setDescription(data.sm_api_content.substring(2043, data.sm_api_content.length))
-                                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nPage[2/2]\nRequested by ${reacted_user[1]}`)
+                                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nPage[2/2]\nRequested by ${reacted_user[1]}`);
                                         sentembed.edit(editembed);
                                     }
-                                })
+                                });
                         });
                     }
                     //for normal summaries
@@ -68,13 +68,15 @@ module.exports = async message => {
                             .setTitle(data.sm_api_title)
                             .setColor('#FF7F50')
                             .setDescription(summary)
-                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nRequested by ${reacted_user[1]}`)
+                            .setFooter(`I have reduced the article for you by ${data.sm_api_content_reduced}\nRequested by ${reacted_user[1]}`);
                         message.channel.send(embed);
                     }
                 }
             });
+        message.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
     }
 };
+
 module.exports.help = {
     event: 'message'
 };
