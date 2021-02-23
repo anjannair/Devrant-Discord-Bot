@@ -32,6 +32,7 @@ module.exports = async message => {
                 const waitreaction = collected.first();
                 var reacted_user = collected.first().users.cache.map(user => user.username + "#" + user.discriminator);
                 if (waitreaction.emoji.name === '❓') {
+                    message.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
 
                     //To handle the limitations of text by discord 
                     if (data.sm_api_character_count > 2048) {
@@ -72,8 +73,10 @@ module.exports = async message => {
                         message.channel.send(embed);
                     }
                 }
+            })
+            .catch(collected => {
+                message.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
             });
-        message.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
     }
 };
 
