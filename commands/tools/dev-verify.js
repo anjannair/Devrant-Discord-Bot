@@ -48,7 +48,15 @@ module.exports = class verify extends Command {
         const embed = new Discord.MessageEmbed()
             .setColor('#FF7F50')
             .setDescription(`-connect+discord+${captcha}-`);
-        message.author.send(embed);    //sends the captcha
+        
+        let erro; //store the error
+        await message.author.send(embed).catch(err=>{   //sends the captcha
+            erro = err;
+        });
+
+        if(erro){
+            return message.reply("I could not send the token to you!\n**PLEASE ENSURE YOUR DMS ARE ON**")
+        }
 
         try {
             const msg = await message.reply("Sent you the verification token\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`)\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
