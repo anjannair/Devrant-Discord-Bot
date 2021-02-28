@@ -14,7 +14,7 @@ module.exports = async (member) => {
     var embs = new Discord.MessageEmbed()
         .setColor('#FF7F50')
         .setTitle(`Welcome to the devRant Community Server (dRCS)!`)
-        .setDescription(`Please familiarize with the <#${process.env.RULES}>\n\n**Optionally you can verify your devRant identity on the <#${process.env.SPAM}> channel by using \`*verify\` command!**\n\nThank you and stay tuned!!`);
+        .setDescription(`Please familiarize with the <#${process.env.RULES}>\n\n**Optionally you can verify your devRant identity on the <#${process.env.SPAM}> channel by using \`*verify\` command!**\n\nThank you and have a great time!!`);
     member.send(embs).catch(err => {
         return;
     });

@@ -51,7 +51,7 @@ module.exports = class verify extends Command {
         message.author.send(embed);    //sends the captcha
 
         try {
-            const msg = await message.reply("Sent you the verification token\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`) on the main post\n\nLink: https://devrant.com/collabs/3221539/devrant-community-server-in-discord\n\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
+            const msg = await message.reply("Sent you the verification token\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`)\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
 
             try {
                 const filter = m => {
@@ -73,18 +73,25 @@ module.exports = class verify extends Command {
                     let response2 = await fetch(commentfetcher);
                     let data2 = await response2.json();
                     rantbody = data2.profile.content.content.comments[0].body;
-                    rantcommentid = data2.profile.content.content.comments[0].rant_id;
+                    //rantcommentid = data2.profile.content.content.comments[0].rant_id;
 
+                    /*
+                    
+                    CONSTANT COMMENT ON THE SAME POST KEPT NOTIFYING PEOPLE
+                    TO REMOVE THAT I HAVE INCORPORATED A FEATURE TO CHECK THE USERS RECENT COMMENT REGARDLESS
+                    OF WHERE HE POSTED IT
+
+                    */
                     //checks for rant and token in rant
-                    const notfoundrantcommentid = new Discord.MessageEmbed()
-                        .setColor("#FF0000")
-                        .setDescription("Your recent comment is not in the link provided\nAborting....");
+                    // const notfoundrantcommentid = new Discord.MessageEmbed()
+                    //     .setColor("#FF0000")
+                    //     .setDescription("Your recent comment is not in the link provided\nAborting....");
 
                     const notfoundrantbody = new Discord.MessageEmbed()
                         .setColor("#FF0000")
                         .setDescription("Couldn't find the token\nEnsure your recent comment was the token")
 
-                    if (rantcommentid != process.env.MAINRANT) return message.author.send(notfoundrantcommentid);
+                    // if (rantcommentid != process.env.MAINRANT) return message.author.send(notfoundrantcommentid);
                     if (rantbody != `-connect+discord+${captcha}-`) return message.author.send(notfoundrantbody);
 
                     //finding the role
