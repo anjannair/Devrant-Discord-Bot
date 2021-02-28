@@ -76,7 +76,7 @@ module.exports = class verify extends Command {
                     //rantcommentid = data2.profile.content.content.comments[0].rant_id;
 
                     /*
-                    
+
                     CONSTANT COMMENT ON THE SAME POST KEPT NOTIFYING PEOPLE
                     TO REMOVE THAT I HAVE INCORPORATED A FEATURE TO CHECK THE USERS RECENT COMMENT REGARDLESS
                     OF WHERE HE POSTED IT
@@ -89,10 +89,13 @@ module.exports = class verify extends Command {
 
                     const notfoundrantbody = new Discord.MessageEmbed()
                         .setColor("#FF0000")
-                        .setDescription("Couldn't find the token\nEnsure your recent comment was the token")
+                        .setDescription("Couldn't find the token\nEnsure your recent comment was the token and try again!")
 
                     // if (rantcommentid != process.env.MAINRANT) return message.author.send(notfoundrantcommentid);
-                    if (rantbody != `-connect+discord+${captcha}-`) return message.author.send(notfoundrantbody);
+                    if (rantbody != `-connect+discord+${captcha}-`) {
+                        await message.react('❌');
+                        return message.author.send(notfoundrantbody);
+                    }
 
                     //finding the role
                     let verified = message.member.guild.roles.cache.find(role => role.id === process.env.VERIFIED);
@@ -106,6 +109,7 @@ module.exports = class verify extends Command {
                             .setColor('#00FF00')
                             .setDescription("You have been verified\n\nPro tip: Use `*rant` on the server to check out devRant rants!")
                             .setFooter("Signing off", "https://emoji.gg/assets/emoji/9192_random_tick.png");
+                        await message.react('✔');
                         message.author.send(verifembed);
                     }
                     if (!verified) console.log("No verified tag");
