@@ -55,7 +55,7 @@ module.exports = class verify extends Command {
         });
 
         if(erro){
-            return message.reply("I could not send the token to you!\n**PLEASE ENSURE YOUR DMS ARE ON**")
+            return message.reply("I could not send the token to you!\n**PLEASE ENSURE YOUR DMS ARE OPEN**")
         }
 
         try {
