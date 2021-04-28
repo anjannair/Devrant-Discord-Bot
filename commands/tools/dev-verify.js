@@ -47,6 +47,7 @@ module.exports = class verify extends Command {
             const input = await message.channel.awaitMessages(({ cleanContent }) => {
                 return !/\s/g.test(cleanContent);
             }, { max: 1, time: 60000, errors: ['time'] });
+            username = input.first().cleanContent;
 
             ({ user_id } = await this.fetchDRUserID(username));
             if (!user_id) {
@@ -54,7 +55,6 @@ module.exports = class verify extends Command {
                     `Sorry, ${message.author}. I can't verify this name too. Type \`*verify\` when you're a little... mmmmm... assured!`
                 );
             }
-            username = input.first().cleanContent;
         }
         message.member.setNickname(username);
 
