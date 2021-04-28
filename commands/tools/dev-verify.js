@@ -20,115 +20,99 @@ module.exports = class verify extends Command {
         });
     }
 
+    async fetchDRUserID(username) {
+        const response = await fetch(`${apiurl.url}/get-user-id?app=3&username=${username}`);
+        return response.json();
+    }
+    async fetchDRUser(id) {
+        const response = await fetch(`${apiurl.url}/users/${id}?app=3`);
+        return response.json();
+    }
+
     async run(message) {
-
-        //checking if already verified
-        let alreadyverified = message.member.roles.cache.find(role => role.id === process.env.VERIFIED)
-        const alreadyverifembed = new Discord.MessageEmbed()
-            .setColor('#00FF00')
-            .setDescription("__You are already verified!__\n\nPro tip: Use `*rant` to see rants from devRant")
-            .setFooter("Enjoy", "https://emoji.gg/assets/emoji/9192_random_tick.png");
-        if (alreadyverified) return message.reply(alreadyverifembed)
-
-        //creating captcha
-        const captcha = Math.random().toString(36).slice(2, 8);
-        let rantcommentid;  //to verify if comment in main post
-        let rantbody;   //to verify the captcha
-
-        //getting the userID by name
-        let userid;
-        let idfetcher = `${apiurl.url}/get-user-id?app=3&username=${message.member.displayName}`;
-        let response = await fetch(idfetcher);
-        let data = await response.json();
-
-        //checking for invalid username
-        if (!data.user_id) return message.reply("__Your username or nickname on Discord does not match the one on devRant!__\n\nPro tip: To change your nickname just use the `*nick` command")
-        userid = data.user_id;
-
-        const embed = new Discord.MessageEmbed()
-            .setColor('#FF7F50')
-            .setDescription(`-connect+discord+${captcha}-`);
-        
-        let erro; //store the error
-        await message.author.send(embed).catch(err=>{   //sends the captcha
-            erro = err;
-        });
-
-        if(erro){
-            return message.reply("I could not send the token to you!\n**PLEASE ENSURE YOUR DMS ARE OPEN**")
+        const memberVerifiedRole = message.member.roles.cache.get(process.env.VERIFIED);
+        if (memberVerifiedRole) {
+            return message.reply({
+                embed: {
+                    title: `No need for this! 🙌`,
+                    description: `You have ${memberVerifiedRole} already.`
+                }
+            });
         }
 
-        try {
-            const msg = await message.reply("Sent you the verification token\n\nNow head to devRant and comment the token in the format sent (\`-connect+discord+TOKEN-\`)\n**ENSURE IT'S YOUR RECENT COMMENT\nAFTER YOU FINISH COMMENTING THE TOKEN TYPE \`DONE\` HERE**");
+        let username = message.member.displayName;
+        let { user_id } = await this.fetchDRUserID(username);
+        if (!user_id) {
+            message.reply(`There is no user by name \`${username}\` on devRant. Please type your devrant.com username below...`);
+            const input = await message.channel.awaitMessages(({ cleanContent }) => {
+                return !/\s/g.test(cleanContent);
+            }, { max: 1, time: 60000, errors: ['time'] });
 
-            try {
-                const filter = m => {
-                    if (m.author.bot) return;
-                    if (m.author.id === message.member.id && m.content.toLowerCase() === "done") return true;
-                    if (m.content.toLowerCase() != "done" && m.author.id === message.member.id) {
-                        m.say('Please type \`DONE\`');
-                        return false;
-                    }
-                    else {
-                        return false;
-                    }
-                };
+            ({ user_id } = await this.fetchDRUserID(username));
+            if (!user_id) {
+                return message.channel.send(
+                    `Sorry, ${message.author}. I can't verify this name too. Type \`*verify\` when you're a little... mmmmm... assured!`
+                );
+            }
+            username = input.first().cleanContent;
+        }
+        message.member.setNickname(username);
 
-                const response = await msg.channel.awaitMessages(filter, { max: 1, time: 600000, errors: ['time'] });
-                if (response) {
-                    //getting the latest comment by ID
-                    let commentfetcher = `${apiurl.url}/users/${userid}?app=3`
-                    let response2 = await fetch(commentfetcher);
-                    let data2 = await response2.json();
-                    rantbody = data2.profile.content.content.comments[0].body;
-                    //rantcommentid = data2.profile.content.content.comments[0].rant_id;
+        const code = Math.random().toString(36).slice(2, 8);
+        const token = `-connect+discord+${code}-`;
 
-                    /*
-
-                    CONSTANT COMMENT ON THE SAME POST KEPT NOTIFYING PEOPLE
-                    TO REMOVE THAT I HAVE INCORPORATED A FEATURE TO CHECK THE USERS RECENT COMMENT REGARDLESS
-                    OF WHERE HE POSTED IT
-
-                    */
-                    //checks for rant and token in rant
-                    // const notfoundrantcommentid = new Discord.MessageEmbed()
-                    //     .setColor("#FF0000")
-                    //     .setDescription("Your recent comment is not in the link provided\nAborting....");
-
-                    const notfoundrantbody = new Discord.MessageEmbed()
-                        .setColor("#FF0000")
-                        .setDescription("Couldn't find the token\nEnsure your recent comment was the token and try again!")
-
-                    // if (rantcommentid != process.env.MAINRANT) return message.author.send(notfoundrantcommentid);
-                    if (rantbody != `-connect+discord+${captcha}-`) {
-                        await response.first().react('❌');
-                        return message.author.send(notfoundrantbody);
-                    }
-
-                    //finding the role
-                    let verified = message.member.guild.roles.cache.find(role => role.id === process.env.VERIFIED);
-                    let unverified = message.member.guild.roles.cache.find(role => role.id === process.env.UNVERIFIED);
-                    if (verified) {
-                        message.member.roles.add(verified).catch(err => {
-                            return message.reply("I do not have permissions to add the role to you😭")
-                        });
-                        message.member.roles.remove(unverified);
-                        const verifembed = new Discord.MessageEmbed()
-                            .setColor('#00FF00')
-                            .setDescription("You have been verified\n\nPro tip: Use `*rant` on the server to check out devRant rants!")
-                            .setFooter("Signing off", "https://emoji.gg/assets/emoji/9192_random_tick.png");
-                        await response.first().react('✔');
-                        message.author.send(verifembed);
-                    }
-                    if (!verified) console.log("No verified tag");
+        const tickEmoji = "✅";
+        const doneKeyword = "done";
+        const tokenMessage = await message.reply(
+            `To verify connection, send following *token* as part of a last comment anywhere on devRant: \`\`\`${token}\`\`\``,
+            {
+                embed: {
+                    title: `📨 You can send it __in our collab__`,
+                    description: `Press ${tickEmoji} or type __**\`${doneKeyword}\`**__ below once you send the token.`,
+                    url: `https://devrant.com/collabs/${process.env.MAINRANT}`
                 }
             }
-            catch (err) {
-                console.log(err);
+        );
+        tokenMessage.react(tickEmoji);
+
+        for (let i = 2; i >= 0; i--) {
+            try {
+                await Promise.race([
+                    tokenMessage.awaitReactions(({ emoji: { name } }, user) => {
+                        return name === tickEmoji && user.id === message.author.id;
+                    }, { max: 1, time: 120000, errors: ['time'] }),
+                    message.channel.awaitMessages(({ author, cleanContent }) => {
+                        return cleanContent.toLowerCase() === doneKeyword && author.id === message.author.id;
+                    }, { max: 1, time: 120000, errors: ['time'] })
+                ])
+            } catch (_) {
+                return message.channel.send(`I can't wait too long. Please call this command again once you are ready.`);
             }
-        }
-        catch (err) {
-            console.log(err);
+
+            const userData = await this.fetchDRUser(user_id);
+            const body = userData.profile?.content?.content?.comments[0]?.body;
+            if (body && body.indexOf(token) > -1) break;
+            else if (i) {
+                message.reply(`Token was not found in the last comment. Try again.`);
+            } else {
+                return message.reply(`Post a comment containing the token on devrant.com for me to work with.\nOnce you are ready to repeat, type \`*verify\`.`);
+            }
+        };
+
+        const unverifiedRole = message.guild.roles.cache.get(process.env.UNVERIFIED);
+        const verifiedRole = message.guild.roles.cache.get(process.env.VERIFIED);
+        if (unverifiedRole) message.member.roles.remove(unverifiedRole);
+        if (verifiedRole) {
+            message.member.roles.add(verifiedRole);
+            return message.reply({
+                embed: {
+                    title: `You are awesome! 😉`,
+                    description: `Get ${verifiedRole}.`,
+                    thumbnail: {
+                        url: message.guild.iconURL({ size: 32 })
+                    }
+                }
+            });
         }
     }
 };
