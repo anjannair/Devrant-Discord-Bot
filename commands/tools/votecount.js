@@ -91,18 +91,33 @@ module.exports = class votecount extends Command {
             const rangeLabel = range.length === 1 ? range[0].toString() : `${rangeMin}–${rangeMax}`;
             const rangeList = [];
 
+            let embed, fields;
             for (const { message, points: { likes, dislikes, total } } of entries) {
                 if (total < rangeMin || total > rangeMax) continue;
-                let title = message.cleanContent.split("\n", 1)[0].trim() || message.embeds[0]?.title || "...";
-                rangeList.push(`\`${total.toString().padStart(2)} (${likes.toString().padEnd(2)}👍/👎${dislikes.toString().padStart(2)}) \`🔎 __**${title}**__`);
+                
+                let embedContinued;
+                if (embed?.fields?.length >= 25) {
+                  await message.channel.send(embed);
+                  embed = null;
+                  embedContinued = true;
+                }
+                if (!embed) {
+                  embed = {
+                    title: `${rangeLabelPrefix} ${rangeLabel} pts ${embedContinued ? '*(continued)*' : ''}`,
+                    fields: []
+                  };
+                }
+                
+                const title = message.cleanContent.split("\n", 1)[0].trim() || message.embeds[0]?.title || "...";
+                fields.push({
+                  name: `${total} (${likes}👍/👎${dislikes})`,
+                  value: `__**${title}**__`
+                });
             }
 
-            await message.channel.send({
-              embed: {
-                title: `${rangeLabelPrefix} ${rangeLabel} pts`,
-                description: `\n${rangeList.join('\n\n')}`
-              }
-            });
+            if (embed.fields.length) {
+              await message.channel.send(embed);
+            }
         }
 
         return message.channel.send(`Counted ${reactionsCount} reactions on ${entries.length} entries.`);
