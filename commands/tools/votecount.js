@@ -1,6 +1,5 @@
 const { MessageEmbed } = require('discord.js');
 const { Command } = require('discord.js-commando');
-const partition = require('linear-partitioning');
 
 module.exports = class votecount extends Command {
     constructor(client) {
@@ -77,49 +76,27 @@ module.exports = class votecount extends Command {
             return message.reply(`There are no recent votes in ${channel}. Make sure messages have 👍 or 👎.`);
         }
         
-        entries.sort((entryA, entryB) => entryA.message.createdTimestamp - entryB.message.createdTimestamp);
-        await message.channel.send(`Here's  what we found...`);
+        entries.sort((entryA, entryB) => entryB.points.total - entryA.points.total || entryA.message.createdTimestamp - entryB.message.createdTimestamp);
+        await message.channel.send(`Here is what we found...`);
         
-        // Perform partitioning in accordance with http://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK2/NODE45.HTM
-        const pointRanges = partition(Array.from(pointSet).sort((a, b) => b - a), 8);
-        for (const range of pointRanges) {
-            if (!range.length) break;
-
-            const rangeMin = Math.min(range);
-            const rangeMax = Math.max(range);
-            const rangeLabelPrefix = rangeMin > 0 ? "✅" : "✖";
-            const rangeLabel = range.length === 1 ? range[0].toString() : `${rangeMin}–${rangeMax}`;
-            const rangeList = [];
-
-            let embed, fields;
-            for (const { message: entryMessage, points: { likes, dislikes, total } } of entries) {
-                if (total < rangeMin || total > rangeMax) continue;
-                
-                let embedContinued;
-                if (embed?.fields?.length >= 25) {
-                  await message.channel.send({ embed });
-                  embed = null;
-                  embedContinued = true;
-                }
-                if (!embed) {
-                  embed = {
-                    title: `${rangeLabelPrefix} ${rangeLabel} pts ${embedContinued ? '*(continued)*' : ''}`,
-                    fields: []
-                  };
-                }
-                
-                const title = entryMessage.cleanContent.split("\n", 1)[0].trim() || entryMessage.embeds[0]?.title || 'Untitled';
-                embed.fields.push({
-                  name: `${total} (${likes}👍/👎${dislikes})`,
-                  value: `__**${title}**__`
-                });
-            }
-
-            if (embed.fields.length) {
-              await message.channel.send({ embed });
-            }
+        let embed;
+        for (const { message: entryMessage, points: { likes, dislikes, total } } of entries) {
+          if (embed?.fields.length >= 25) {
+            await message.channel.send(embed);
+            embed = null;
+          }
+          embed = embed ?? new MessageEmbed();
+          
+          const title = entryMessage.cleanContent.split("\n", 1)[0].trim() || entryMessage.embeds[0]?.title || 'Untitled';
+          embed.addField(
+            `${total > 0 ? '👌' : '✖️'} \`${total} pts\` (${likes}👍/👎${dislikes})`,
+            `__**${title}**__`
+          );
         }
-
-        return message.channel.send(`Counted ${reactionsCount} reactions on ${entries.length} entries.`);
+        if (embed.fields.length) {
+          await message.channel.send(embed);
+        }
+        
+        return message.channel.send(`Counted ${reactionsCount} reactions on __${entries.length} entries__.`);
     }
 };
