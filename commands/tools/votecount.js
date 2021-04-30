@@ -92,7 +92,7 @@ module.exports = class votecount extends Command {
             const rangeList = [];
 
             let embed, fields;
-            for (const { message, points: { likes, dislikes, total } } of entries) {
+            for (const { message: entryMessage, points: { likes, dislikes, total } } of entries) {
                 if (total < rangeMin || total > rangeMax) continue;
                 
                 let embedContinued;
@@ -108,8 +108,8 @@ module.exports = class votecount extends Command {
                   };
                 }
                 
-                const title = message.cleanContent.split("\n", 1)[0].trim() || message.embeds[0]?.title || "...";
-                fields.push({
+                const title = entryMessage.cleanContent.split("\n", 1)[0].trim() || entryMessage.embeds[0]?.title || 'Untitled';
+                embed.fields.push({
                   name: `${total} (${likes}👍/👎${dislikes})`,
                   value: `__**${title}**__`
                 });
