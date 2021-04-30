@@ -94,7 +94,7 @@ module.exports = class votecount extends Command {
             for (const { message, points: { likes, dislikes, total } } of entries) {
                 if (total < rangeMin || total > rangeMax) continue;
                 let title = message.cleanContent.split("\n", 1)[0].trim() || message.embeds[0]?.title || "...";
-                rangeList.push(`\`${total.toString().padStart(2)} (${likes.toString().padEnd(2)}👍/👎${dislikes.toString().padStart(2)}) \`🔎 __**${title}**__ ↙ ${message.url}`);
+                rangeList.push(`\`${total.toString().padStart(2)} (${likes.toString().padEnd(2)}👍/👎${dislikes.toString().padStart(2)}) \`🔎 __**${title}**__`);
             }
 
             await message.channel.send({
