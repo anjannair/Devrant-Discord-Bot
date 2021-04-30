@@ -97,7 +97,7 @@ module.exports = class votecount extends Command {
                 
                 let embedContinued;
                 if (embed?.fields?.length >= 25) {
-                  await message.channel.send(embed);
+                  await message.channel.send({ embed });
                   embed = null;
                   embedContinued = true;
                 }
@@ -116,7 +116,7 @@ module.exports = class votecount extends Command {
             }
 
             if (embed.fields.length) {
-              await message.channel.send(embed);
+              await message.channel.send({ embed });
             }
         }
 
