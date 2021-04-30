@@ -25,9 +25,9 @@ module.exports = class votecount extends Command {
     async run(message, { channel }) {
         const entries = [];
         const pointSet = new Set();
-
-        // This may take some loading time, so we inform user via reaction
-        const loadingReaction = await message.react("💬");
+        let reactionsCount = 0;
+        
+        await message.reply(`Searching for entries in ${channel}...`);
         const promises = [];
 
         const channelMessages = await channel.messages.fetch({ limit: 100 });
@@ -65,46 +65,46 @@ module.exports = class votecount extends Command {
                         }
                     });
                     pointSet.add(total);
+                    
+                    reactionsCount += liked.length + disliked.length;
                 });
                 promises.push(promise);
             }
         }
 
         await Promise.all(promises);
-        loadingReaction.users.remove(this.client.id);
-
         if (!entries.length) {
             return message.reply(`There are no recent votes in ${channel}. Make sure messages have 👍 or 👎.`);
         }
         
         entries.sort((entryA, entryB) => entryA.message.createdTimestamp - entryB.message.createdTimestamp);
-
-        const embed = new MessageEmbed()
-            .setTitle(`Counted votes`)
-            .setDescription(`on ${entries.length} entries in ${channel}.`)
-            .setFooter(`Requested: ${message.member.name || message.author.username}`)
-            .setTimestamp();
+        await message.channel.send(`Here's  what we found...`);
         
         // Perform partitioning in accordance with http://www8.cs.umu.se/kurser/TDBAfl/VT06/algorithms/BOOK/BOOK2/NODE45.HTM
-        const pointRanges = partition(Array.from(pointSet).sort((a, b) => b - a), 25);
+        const pointRanges = partition(Array.from(pointSet).sort((a, b) => b - a), 8);
         for (const range of pointRanges) {
             if (!range.length) break;
 
             const rangeMin = Math.min(range);
             const rangeMax = Math.max(range);
             const rangeLabelPrefix = rangeMin > 0 ? "✅" : "✖";
-            const rangeLabel = range.length === 1 ? range[0] : `${rangeMin}–${rangeMax}`;
+            const rangeLabel = range.length === 1 ? range[0].toString() : `${rangeMin}–${rangeMax}`;
             const rangeList = [];
 
             for (const { message, points: { likes, dislikes, total } } of entries) {
                 if (total < rangeMin || total > rangeMax) continue;
                 let title = message.cleanContent.split("\n", 1)[0].trim() || message.embeds[0]?.title || "...";
-                rangeList.push(`\`${total.toString().padStart(2)} pts (${likes.toString().padEnd(2)}👍/👎${dislikes.toString().padStart(2)}) \`🔎 __**${title}**__ ↙ ${message.url}`);
+                rangeList.push(`\`${total.toString().padStart(2)} (${likes.toString().padEnd(2)}👍/👎${dislikes.toString().padStart(2)}) \`🔎 __**${title}**__ ↙ ${message.url}`);
             }
 
-            embed.addField(`${rangeLabelPrefix} ${rangeLabel}`, rangeList.join("\n"));
+            await message.channel.send({
+              embed: {
+                title: `${rangeLabelPrefix} ${rangeLabel} pts`,
+                description: `\n${rangeList.join('\n\n')}`
+              }
+            });
         }
 
-        return message.channel.send(embed);
+        return message.channel.send(`Counted ${reactionsCount} reactions on ${entries.length} entries.`);
     }
 };
