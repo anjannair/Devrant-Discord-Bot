@@ -89,7 +89,7 @@ module.exports = class votecount extends Command {
           
           const title = entryMessage.cleanContent.split("\n", 1)[0].trim() || entryMessage.embeds[0]?.title || 'Untitled';
           embed.addField(
-            `${total > 0 ? '👌' : '✖️'} \`${total} pts\` (${likes}👍/👎${dislikes})`,
+            `_\n${total > 0 ? '👌' : '✖️'} \`${total} pts ( ${likes}👍/👎${dislikes} )\``,
             `__**${title}**__`
           );
         }
