@@ -3,8 +3,6 @@ const Discord = require("discord.js");
 const path = require('path');
 const fs = require("fs");
 require('dotenv').config();
-const Heroku = require('heroku-client');
-const heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
 const config = require( path.resolve( __dirname, "config.json" ) );
 
 const client = new CommandoClient({
@@ -36,16 +34,6 @@ client.registry
 client.once('ready', async () => {
 	console.log(`Logged in as ${client.user.username}`);
 	client.user.setActivity(config.activity.game, {type:'STREAMING'});
-	//Message to inform user about bot activate
-	const user = client.users.cache.get(process.env.OWNERS.split(',')[0]);
-	await heroku.get('/apps').then(apps => {
-		const embed = new Discord.MessageEmbed()
-			.setColor("#E7A700")
-			.setDescription("**" + apps[0].name + "** is up and running!")
-			.addField("Date", apps[0].updated_at.split('T')[0])
-			.addField("UTC Time (+5:30 IST)", apps[0].updated_at.split('T')[1].split('Z')[0]);
-		user.send(embed);
-	});
 });
 
 //parsing events
