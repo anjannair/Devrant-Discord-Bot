@@ -14,3 +14,5 @@ This bot was built for the devRant Discord community. The bot has been built by 
 4. Summarizes links - Links are summarized using the `smmry` API.
 <br>
 ......and more.
+
+Do check out the [verification wiki](https://github.com/anjannair/Devrant-Discord-Bot/wiki/How-To-Verify-Yourself) page to understand how users can verify themselves.
