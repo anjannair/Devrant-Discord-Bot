@@ -26,6 +26,7 @@ client.registry
 	.registerDefaultCommands({
 		ping: false,
 		prefix: false,
+		eval: false,
 		commandState: false,
 		unknownCommand: false,
 	})
