@@ -1,9 +1,10 @@
 // Util
 const fs = require("fs");
-
 // Slash Commands
 const slash = require("../util/slash");
-
+const index = require('../index');
+const bot = index.client;
+const config = require("../config.json");
 // CLI
 console.log("Starting Discord.js Client");
 
@@ -11,6 +12,8 @@ module.exports = {
   event: "ready", // Name of the event
   oneTime: true, // If set to true the event will only be fired once until the client is restarted
   run: async (client) => {
+
+    bot.user.setActivity(config.activity.game, {type:'STREAMING'});
 
     // Code variables has to re-written again because this was made in haste
     const commandFolder = fs

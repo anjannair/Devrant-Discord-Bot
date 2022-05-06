@@ -19,9 +19,6 @@ if (
     Intents.FLAGS.GUILD_MEMBERS,
   ])
 ) {
-  // intentsLoader.warn(
-  //   "Intents in config file must be in an array, default intents will be used"
-  // );
   console.log(
     "Intents in config file must be in an array, default intents will be used"
   );
@@ -32,7 +29,6 @@ if (
     Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
     Intents.FLAGS.GUILD_MEMBERS,
   ];
-  // intentsLoader.succeed("Loaded intents successfully from the config file");
   console.log("Loaded intents successfully from the config file");
 }
 

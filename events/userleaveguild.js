@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const index = require("../index");
 const bot = index.client;
-require('dotenv').config();
+require("dotenv").config();
 module.exports = {
   event: "guildMemberRemove", // Name of the event
   oneTime: false, // If set to true the event will only be fired once until the client is restarted
