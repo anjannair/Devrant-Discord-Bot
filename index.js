@@ -1,53 +1,61 @@
-const { CommandoClient } = require('discord.js-commando');
-const Discord = require("discord.js");
-const path = require('path');
+require("dotenv").config();
+const config = require("./config");
 const fs = require("fs");
-require('dotenv').config();
-const config = require( path.resolve( __dirname, "config.json" ) );
 
-const client = new CommandoClient({
-	commandPrefix: config.prefix,
-	owner: process.env.OWNERS.split(','),	//if you're helping in developing this add your ID
-	disableMentions: 'everyone',
-	ws: { intents: Discord.Intents.ALL }
-});
+// Slash Commands
+const { Client, Collection, Intents } = require("discord.js");
+const slash = require("./util/slash");
 
+// CLI
+console.log("Loading intents");
+
+// Checks
+let finalIntents = [];
+if (
+  !Array.isArray([
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_MEMBERS,
+  ])
+) {
+  // intentsLoader.warn(
+  //   "Intents in config file must be in an array, default intents will be used"
+  // );
+  console.log(
+    "Intents in config file must be in an array, default intents will be used"
+  );
+} else {
+  finalIntents = [
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_MEMBERS,
+  ];
+  // intentsLoader.succeed("Loaded intents successfully from the config file");
+  console.log("Loaded intents successfully from the config file");
+}
+
+const client = new Client({ intents: finalIntents });
 module.exports = {
-	client: client,
+  client: client,
 };
 
-client.registry
-	.registerDefaultTypes()
-	.registerGroups([ //Classifies each command and sorts it
-		['tools', 'All the tools for the server'],	//for all the tools
-		['usersettings', 'All the setings for the user'], //for the user
-	])
-	.registerDefaultGroups()
-	.registerDefaultCommands({
-		ping: false,
-		prefix: false,
-		eval: false,
-		commandState: false,
-		unknownCommand: false,
-	})
-	.registerCommandsIn(path.join(__dirname, 'commands'));
+// Commands
+client.commands = new Collection();
 
-client.once('ready', async () => {
-	console.log(`Logged in as ${client.user.username}`);
-	client.user.setActivity(config.activity.game, {type:'STREAMING'});
+const events = fs
+  .readdirSync("./events")
+  .filter((file) => file.endsWith(".js"));
+
+events.forEach((event) => {
+  const eventFile = require(`./events/${event}`);
+  if (eventFile.oneTime) {
+    client.once(eventFile.event, (...args) => eventFile.run(...args));
+  } else {
+    client.on(eventFile.event, (...args) => eventFile.run(...args));
+  }
 });
-
-//parsing events
-fs.readdir('./events', (err, files) => {
-	if (err) return console.log(err);
-	let jsFiles = files.filter(file => file.split('.').pop() === 'js');
-	jsFiles.forEach(file => {
-		const prop = require(`./events/${file}`);
-		client.on(prop.help.event, prop);
-	});
-});
-
-
-client.on('error', console.error);
 
 client.login(process.env.TOKEN);
+console.log("Logged in!");

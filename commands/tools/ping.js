@@ -1,32 +1,17 @@
-const { Command } = require('discord.js-commando');
-const Discord = require('discord.js');
-//basic command to test
-module.exports = class ping extends Command {
-	constructor(client) {
-		super(client, {
-			name: 'ping',
-			group: 'tools',
-			memberName: 'ping',
-			description: 'Check the ping of the bot',
-			guildOnly: true
-		});
-	}
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const { MessageEmbed } = require("discord.js");
 
-	async run(message) {
-		var intro = new Discord.MessageEmbed()
-			.setTitle('Pinging...')
-			.setColor("RANDOM")
-		message.channel.send(intro).then(m => {
-			// The math thingy to calculate the user's ping
-			var ping = m.createdTimestamp - message.createdTimestamp;
-
-			// Basic embed
-			var embed = new Discord.MessageEmbed()
-				.setTitle(`Your ping is ${ping}`)
-				.setColor("RANDOM")
-			setTimeout(() => {
-				m.edit(embed)
-			}, 2000)
-		});
-	}
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Ping test!"),
+  run: async (interaction) => {
+    const embed = new MessageEmbed()
+      .setTitle("Ping!")
+      .setColor("#71B8FF")
+      .setDescription(
+        `Pong! Latency is ${Math.abs(Date.now() - interaction.createdTimestamp)}ms.`
+      );
+    interaction.reply({ embeds: [embed], ephemeral: true });
+  },
 };
