@@ -9,10 +9,12 @@ module.exports = {
     const lag = bot.emojis.cache.get("764808105653043202");
     if (member.user.bot) return;
 
-    var channel = member.guild.channels.cache.find(
+    var channel = await member.guild.channels.cache.find(
       (ch) => ch.id === process.env.WELCOME
     );
-    if (!channel) return;
+    if (!channel){
+      console.log(`Channel ${process.env.WELCOME} not found!`);
+    }
 
     channel.send(`Sob-sob... ${member.user.tag} has left the server ${lag}`);
   },

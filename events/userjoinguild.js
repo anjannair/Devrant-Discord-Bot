@@ -21,6 +21,7 @@ module.exports = {
         `Please familiarize with the <#${process.env.RULES}>\n\n**Optionally you can verify your devRant identity on the <#${process.env.SPAM}> channel by using \`*verify\` command!**\n\nThank you and have a great time!!`
       );
     member.send(embs).catch((err) => {
+      console.log(`Member ${member.user.tag} could not be sent a welcome message!`);
       return;
     });
   },
