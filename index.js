@@ -10,27 +10,12 @@ const slash = require("./util/slash");
 console.log("Loading intents");
 
 // Checks
-let finalIntents = [];
-if (
-  !Array.isArray([
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.GUILD_MEMBERS,
-  ])
-) {
-  console.log(
-    "Intents in config file must be in an array, default intents will be used"
-  );
-} else {
-  finalIntents = [
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.GUILD_MEMBERS,
-  ];
-  console.log("Loaded intents successfully from the config file");
-}
+let finalIntents = [
+  Intents.FLAGS.GUILD_MESSAGES,
+  Intents.FLAGS.GUILDS,
+  Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  Intents.FLAGS.GUILD_MEMBERS,
+];
 
 const client = new Client({ intents: finalIntents });
 module.exports = {
