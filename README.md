@@ -1,4 +1,5 @@
 # The devRant Discord bot
+# The following code runs on DJs v12 using the Commando framework which has now been deprecated! This branch has only been kept for archival reasons! This branch will not be maintained further!
 
 This bot was built for the devRant Discord community. The bot has been built by `epictern` and `vintprox` using the Commando framework for Discord.
 
