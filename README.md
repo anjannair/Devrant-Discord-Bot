@@ -21,7 +21,6 @@ To ease the process of development for everyone without any NodeJs conflicts, Do
 
 Pre-requisites -
 1. To build using Docker ensure you have it [installed](https://docs.docker.com/get-docker/)
-2. Finally ensure you have [nodemon](https://nodemon.io/) installed locally in your folder for monitoring realtime changes to your code by running **npm i nodemon**
-3. Build a Docker image using `docker build -t devrant .` (yes, even that fullstop). This will build a custom Docker image with the name **devrant**
-4. To create containers from the image and see changes in realtime just run `docker run -i -v $(pwd):/app devrant`
-5. To stop the Docker container get the ID using `docker ps` (in a new terminal) and then run `docker stop <id>`
+2. Build a Docker image using `docker build -t devrant .` (yes, even that fullstop). This will build a custom Docker image with the name **devrant**
+3. To create containers from the image and see changes in realtime just run `docker run -i -v $(pwd):/app devrant`
+4. To stop the Docker container get the ID using `docker ps` (in a new terminal) and then run `docker stop <id>`
