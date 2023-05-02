@@ -1,6 +1,6 @@
-# The devRant Discord bot
+# The devRant Discord bot (deprecated)
 
-This bot was built for the devRant Discord community. The bot has been built by `epictern` and `vintprox`. Currently uses DJS v13.
+This bot was built for the devRant Discord community. Currently uses DJS v13.
 
 <div align="center">
 <img src="https://apprecs.org/gp/images/app-icons/300/0f/com.hexicallabs.devrant.jpg">
